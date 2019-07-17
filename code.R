@@ -1,6 +1,6 @@
-setwd("/home/breno/DataScience/Github/DataScience_projects/Titanic/DataScience_projects")
+setwd("./")
 
-# the main goal is catch up 81% of accuracy in predict the possibility surviving 
+# the main goal is catch up 80% of accuracy in predict the possibility surviving 
 
 # loading libraries
 library(dplyr)
@@ -53,8 +53,7 @@ summary(df)
 
 # the column Cabin has many values missing
 df$Cabin <- NULL
-# I'll assume that the name and ticket won't influence the survived
-df$Name <- NULL
+# I'll assume that the ticket won't influence the survived
 df$Ticket <- NULL
 df$PassengerId <- NULL
 
@@ -146,23 +145,85 @@ Age_to_units <- function(input)
   }
 }
 
+# há titulos nos nomes das pessoas. split esses titulos para montar 
+# uma nova coluna
+
+library(stringr)
+
+get_title <- function(x)
+{
+  # use um gsub 
+  pattern = ", .*\\. "
+  retorno = str_extract_all(x, pattern)
+  retorno = gsub(",", "", retorno)
+  retorno = str_trim(retorno)
+  return(retorno)
+}
+
+df$title <- (sapply(df$Name, get_title))
+df$title[513] <- "Mrs."
+
+others <- c('Dona.', 'Lady.', 'the Countess.','Capt.', 'Col.', 'Don.', 
+             'Dr.', 'Major.', 'Rev.', 'Sir.', 'Jonkheer.')
+
+df$title[df$title == 'Mlle.']   <- 'Miss.' 
+df$title[df$title== 'Ms.']      <- 'Miss.'
+df$title[df$title == 'Mme.']    <- 'Mrs.' 
+df$title[df$title %in% others]  <- 'others titles'
+
+title_to_numeric <- function(x)
+{
+  if(x == "Master.")
+  {
+    return(1)
+  }
+  else if(x == "Miss.")
+  {
+    return(2)
+  }
+  else if(x == "Mr.")
+  {
+    return(3)
+  }
+  else if(x == "Mrs.")
+  {
+    return(4)
+  }
+  else
+  {
+    return(5)
+    }
+}
+
+
+df$Name <- NULL
+
+df <- df %>%
+  select(Survived:title) %>%
+  mutate(AgeClass = Age*Pclass)
+
+
 df$Sex <- sapply(df$Sex , sex_to_numeric)
 df$Embarked <- sapply(df$Embarked, embarked_to_numeric)
 df$Fare <- sapply(df$Fare, Fare_to_discrete)
 df$Age <- sapply(df$Age, Age_to_units)
+df$title <- sapply(df$title, title_to_numeric)
 
-df <- df %>%
-  select(Survived:Parent) %>%
-  mutate(AgeClass = Age*Pclass)
-
+summary(df$class)
 # split the datas in train and test
-set.seed(100)
 ??sample.split
 library(caTools)
 amostra <- sample.split(df$Pclass, SplitRatio = 0.70)
 
 train <- subset(df, amostra == T)
 test <- subset(df, amostra == F)
+
+normalizar <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+train2 <- as.data.frame(lapply(train, normalizar))
+test2 <- as.data.frame(lapply(test, normalizar))
 
 # split the variable target to predict
 target_train <- train$Survived
@@ -176,13 +237,6 @@ summary(test)
 
 ??knn
 library(class)
-
-normalizar <- function(x) {
-  return ((x - min(x)) / (max(x) - min(x)))
-}
-
-train2 <- as.data.frame(lapply(train, normalizar))
-test2 <- as.data.frame(lapply(test, normalizar))
 
 # creating the model
 model_knn1 <- knn(train = train2,
@@ -201,6 +255,7 @@ library(e1071)
 target_test2 <- test2$Survived
 test2$Survived <- NULL
 
+# this method is good in train, but in test is not so good. Maybe it's an case of overfitting
 model_svm <- svm(Survived ~ .,
                   data = train2,
                   type = "C-classification",
@@ -211,6 +266,8 @@ mean(pred_svm == target_test2)
 
 ??randomForest
 library(randomForest)
+
+# this method é better than svm in test
 rf_model <- randomForest(factor(Survived) ~ .,
                          data = train2)
 
@@ -218,23 +275,37 @@ rf_model <- randomForest(factor(Survived) ~ .,
 pred_rf <- predict(rf_model, test2)
 mean(pred_rf == target_test2)
 
-# making the same transformation that we did for test data
+library(caret)
+varImp(rf_model)
+
+# making the same transformation that we did for train data
 df_test <- read.csv("test.csv", stringsAsFactors = F)
 
 df_test$Cabin <- NULL
-df_test$Name <- NULL
 df_test$Ticket <- NULL
+
+df_test$title <- (sapply(df_test$Name, get_title))
+
+df_test$title[df_test$title == 'Mlle.']   <- 'Miss.' 
+df_test$title[df_test$title== 'Ms.']      <- 'Miss.'
+df_test$title[df_test$title == 'Mme.']    <- 'Mrs.' 
+df_test$title[df_test$title %in% others]  <- 'others titles'
+
+df_test$Name <- NULL
 
 mean_age_test <- mean(na.omit(df_test$Age))
 df_test$Age[is.na(df_test$Age)] <- mean_age_test
+
+df_test[subset(df_test, is.na(Fare))$PassengerId == df_test$PassengerId, 7] <- mean(na.omit(df_test$Fare))
 
 df_test$Sex <- sapply(df_test$Sex , sex_to_numeric)
 df_test$Embarked <- sapply(df_test$Embarked, embarked_to_numeric)
 df_test$Fare <- sapply(df_test$Fare, Fare_to_discrete)
 df_test$Age <- sapply(df_test$Age, Age_to_units)
+df_test$title <- sapply(df_test$title, title_to_numeric)
 
 df_test <- df_test %>% 
-  select(PassengerId:Embarked) %>%
+  select(PassengerId:title) %>%
   mutate(Parent = SibSp + Parch)
 
 df_test <- df_test %>%
@@ -242,8 +313,6 @@ df_test <- df_test %>%
   mutate(AgeClass = Age*Pclass)
 
 summary(df_test)
-
-df_test[subset(df_test, is.na(Fare))$PassengerId == df_test$PassengerId, 7] <- mean(na.omit(df_test$Fare))
 
 passId <- df_test$PassengerId
 df_test$PassengerId <- NULL
