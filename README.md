@@ -1,2 +1,2 @@
-# DataScience_projects
+# DataScienceProjects
 Projects in datascience for training
