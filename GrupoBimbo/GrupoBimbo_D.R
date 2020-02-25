@@ -1,60 +1,10 @@
 # https://www.kaggle.com/c/grupo-bimbo-inventory-demand/data
 
-# descrição dos dados
-# train.csv — the training set
-# test.csv — the test set
-# sample_submission.csv — a sample submission file in the correct format
-# cliente_tabla.csv — client names (can be joined with train/test on Cliente_ID)
-# producto_tabla.csv — product names (can be joined with train/test on Producto_ID)
-# town_state.csv — town and state (can be joined with train/test on Agencia_ID)
-
-# dicionário de dados
-# Semana — Número da semana (de quinta à quarta)
-# Agencia_ID — Sales Depot ID
-# Canal_ID — Sales Channel ID
-# Ruta_SAK — Route ID (Several routes = Sales Depot)
-# Cliente_ID — Client ID
-# NomeCliente — Nome do cliente
-# Produto_ID — Product ID
-# NomeProduto — Nome do Produto
-# venda_unit_semana — Unidade de vendas desta semana (integer)
-# Venda_semana — vendas desta semana (unit: pesos)
-# Dev_uni_proxima — Returns unit next week (integer)
-# Dev_proxima — Returns next week (unit: pesos)
-# Demanda_uni_equil — Adjusted Demand (integer) (This is the target you will predict)
-
-# pesos = moeda mexicana?
-
-# Observações:
-
-# 1)
-# Pode haver produtos no conjunto de testes que não existem no conjunto de trens. Esse é o comportamento esperado 
-# dos dados de inventário, pois há novos produtos sendo vendidos o tempo todo. Seu modelo deve ser capaz de 
-# acomodar isso.
-
-# 2)
-# Existem Clientes_IDs duplicados em Client_table, o que significa que um Cliente_ID pode ter vários 
-# Nomes de clientes muito semelhantes. Isso ocorre porque o nome dos clientes são barulhentos e não padronizados
-# nos dados brutos; portanto, é sua decisão decidir como limpar e usar essas informações.
-
-# 3)
-# A demanda ajustada (Demanda_uni_equil) é sempre> = 0, pois a demanda deve ser 0 ou um valor positivo. 
-# A razão pela qual Venta_uni_hoy - Dev_uni_proxima às vezes tem valores negativos é que os registros de 
-# retorno às vezes duram algumas semanas.
-
-# Problema: O grupo bimbo produz Paẽs e vende esses paẽs para as diversas lojas pelo méxico.
-# O maior problema é que o grupo tinha que estimar quantos paẽs seriam necessários para suprir as demandas das lojas
-# dos clientes. Não tem como eles esperarem chegar a demanda para produzir, então eles produziam uma quantidade
-# baseada na experiência dos funcionários. Caso, produzisse muito haveria a possibilidade de ter muito desperdício
-# já se produzisse pouco poderia deixar de atender os clientes.
- 
 # Objetivo: Prever quantos paẽs serão necessários serem produzidos para suprir as demandas dos clientes.
-
-# adjRequest = (SaleUnitByWeek - ReturnUnitWeek) - se for negativo eu jogo para zero
 
 # ======================================== INÍCIO DO CÓDIGO ==============================================
 
-setwd("/home/breno/Estudo/DataScience/DSA/DSA_DataScience/FormacaoCientistaDados/Curso1_formacaoCientistaDados/Mini_Projetos/ProjetosFeedback/2-Projeto/Deploy")
+setwd("./")
 
 # carregando as bibliotecas
 library(data.table)
@@ -86,9 +36,6 @@ length(unique(cliente$Cliente_ID))
 produto <- read.csv(paste(path, "Product_Table.csv", sep=''))
 
 cidade_estado <- read.csv(paste(path, "town_state.csv", sep=''))
-
-# cria uma amostra de 300 mil de dados do conjunto de treino
-# amostra_treino <- getAmostra("train.csv", 300000)
 
 # verifica se há valores nulos
 sum(is.na(amostra_treino))
@@ -374,12 +321,6 @@ R2_Score(y_pred = lm_result$previsto, y_true = lm_result$real)
 R2_Score(y_pred = knn_result2$previsto, y_true = knn_result2$real)
 
 # Tanto o KNN quanto o LM apresentaram resultados bem altos e similares, mas o KNN demorou
-# mais para treinar o modelo. Resultado muito próximo de 1... overfitting?
-
-# ================================== APLICANDO EM TESTE =============================
-# test <- fread("../Dados/test.csv")
-
-
-
+# mais para treinar o modelo.
 
 # ================================== FIM ===========================================
