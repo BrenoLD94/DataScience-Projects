@@ -1,1 +1,51 @@
-## header1
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/DataScience-Projects/assets/css/style.css?v=2ad99a39629c2f25681e9e887961ae3e03891aaf">
+
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>DataScienceProjects | DataScience-Projects</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="DataScienceProjects" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="webSite:" />
+<meta property="og:description" content="webSite:" />
+<link rel="canonical" href="https://brenold94.github.io/DataScience-Projects/" />
+<meta property="og:url" content="https://brenold94.github.io/DataScience-Projects/" />
+<meta property="og:site_name" content="DataScience-Projects" />
+<script type="application/ld+json">
+{"@type":"WebSite","url":"https://brenold94.github.io/DataScience-Projects/","name":"DataScience-Projects","description":"webSite:","headline":"DataScienceProjects","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <a id="a-title" href="/DataScience-Projects/">
+          <h1>DataScience-Projects</h1>
+        </a>
+        <h2>webSite:</h2>
+
+        <section id="downloads">
+          
+          <a href="https://github.com/BrenoLD94/DataScience-Projects" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1 id="datascienceprojects">DataScienceProjects</h1>
+<p>Projects in datascience for training in R and Python.</p>
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>
