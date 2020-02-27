@@ -1,1 +1,1 @@
-[Grupo Bimbo]{./GrupoBimbo/GrupoBimbo_D.html}
+[Grupo Bimbo](/GrupoBimbo/GrupoBimbo_D.html)
